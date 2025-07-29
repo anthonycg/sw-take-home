@@ -20,6 +20,7 @@ Things I'd add:
 - Upload/Delete success messages
 - Add files from Google Drive or another source
 - Pagination
+- React Query for cacheing to limit api calls
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to view my submission.
 
