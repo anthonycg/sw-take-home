@@ -1,19 +1,30 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { getImages, test, uploadImage } from "../controllers/imgController.js";
 
-export function routeRequest(req: IncomingMessage, res: ServerResponse): void {
-    // handle CORS headers for all res
+export async function routeRequest(
+    req: IncomingMessage,
+    res: ServerResponse
+): Promise<void> {
+    // handle CORS, content, options headers
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-file-name");
+
+    // handle options preflight request
+    if (req.method === "OPTIONS") {
+        res.writeHead(204);
+        res.end();
+        return;
+    }
+
     // handle routing to proper controller
     console.log("req", req.url);
     if (req.method === "GET" && req.url === "/images") {
-        return getImages(req, res);
+        return await getImages(req, res);
     }
 
     if (req.method === "POST" && req.url == "/upload") {
-        return uploadImage(req, res);
+        return await uploadImage(req, res);
     }
 
     if (req.method === "GET" && req.url == "/test") {

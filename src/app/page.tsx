@@ -1,19 +1,33 @@
 "use client";
 export default function Home() {
-    const test = () => {
-        fetch("http://localhost:3001/test")
+    const uploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files ? e.target.files[0] : null;
+        if (!file) {
+            return;
+        }
+
+        const fileName = file.name;
+
+        fetch("http://localhost:3001/upload", {
+            method: "POST",
+            headers: {
+                "Content-Type": file.type,
+                "x-file-name": fileName,
+            },
+            body: file,
+        })
             .then((res) => {
                 if (!res.ok) {
                     throw new Error(`HTTP err, STATUS: ${res.status}`);
                 }
-                return res.text();
+                console.log(res.json);
             })
             .then((res) => console.log(res))
             .catch((error) => console.log(`Error: ${error}`));
     };
     return (
         <div className="font-sans bg-slate-500 min-h-screen p-8">
-            <button onClick={test}>Test</button>
+            <button>Test</button>
             <div>
                 <input type="text" placeholder="Search"></input>
             </div>
@@ -24,6 +38,7 @@ export default function Home() {
                     type="file"
                     id="fileUpload"
                     name="upload"
+                    onChange={(e) => uploadImage(e)}
                 ></input>
             </label>
         </div>

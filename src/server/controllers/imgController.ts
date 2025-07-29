@@ -47,6 +47,7 @@ export async function uploadImage(req: IncomingMessage, res: ServerResponse) {
             res.statusCode = 500;
             res.end("Error: Upload Failed!");
         }
+        res.statusCode = 200;
     });
 }
 
