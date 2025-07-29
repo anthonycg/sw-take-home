@@ -1,66 +1,85 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 
 export default function Home() {
     const [imageUrls, setImageUrls] = useState<string[]>([]);
+
+    const loadImages = useCallback(() => {
+        fetch("http://localhost:3001/images")
+            .then((res) => res.json())
+            .then((res) => {
+                setImageUrls(res);
+            })
+            .catch(console.error);
+    }, []);
+
+    const uploadImage = useCallback(
+        async (e: React.ChangeEvent<HTMLInputElement>) => {
+            const file = e.target.files ? e.target.files[0] : null;
+            if (!file) {
+                return;
+            }
+
+            const fileName = file.name;
+
+            await fetch("http://localhost:3001/upload", {
+                method: "POST",
+                headers: {
+                    "Content-Type": file.type,
+                    "x-file-name": fileName,
+                },
+                body: file,
+            })
+                .then((res) => {
+                    if (!res.ok) {
+                        throw new Error(`HTTP err, STATUS: ${res.status}`);
+                    }
+                })
+                .then((res) => {
+                    loadImages();
+                    console.log(res);
+                })
+                .catch((error) => console.log(`Error: ${error}`));
+        },
+        [loadImages]
+    );
+
+    const deleteImage = useCallback(
+        async (url: string) => {
+            const splitKeys = url.split("amazonaws.com/");
+            const key = splitKeys[splitKeys.length - 1];
+            await fetch("http://localhost:3001/delete", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ key }),
+            })
+                .then(async (res) => {
+                    if (!res.ok) {
+                        throw new Error(`HTTP err, STATUS: ${res.status}`);
+                    }
+                    return await res.text();
+                })
+                .then((res) => {
+                    loadImages();
+                    console.log(res);
+                })
+                .catch((error) => console.log(`Error: ${error}`));
+        },
+        [loadImages]
+    );
 
     useEffect(() => {
         fetch("http://localhost:3001/images")
             .then((res) => res.json())
             .then((res) => {
                 setImageUrls(res);
-                console.log(res);
             })
             .catch(console.error);
     }, []);
-
-    const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files ? e.target.files[0] : null;
-        if (!file) {
-            return;
-        }
-
-        const fileName = file.name;
-
-        await fetch("http://localhost:3001/upload", {
-            method: "POST",
-            headers: {
-                "Content-Type": file.type,
-                "x-file-name": fileName,
-            },
-            body: file,
-        })
-            .then((res) => {
-                if (!res.ok) {
-                    throw new Error(`HTTP err, STATUS: ${res.status}`);
-                }
-                console.log(res.json);
-            })
-            .then((res) => console.log(res))
-            .catch((error) => console.log(`Error: ${error}`));
-    };
-
-    const deleteImage = async (url: string) => {
-        const splitKeys = url.split("amazonaws.com/");
-        const key = splitKeys[splitKeys.length - 1];
-        await fetch("http://localhost:3001/delete", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ key }),
-        })
-            .then(async (res) => {
-                if (!res.ok) {
-                    throw new Error(`HTTP err, STATUS: ${res.status}`);
-                }
-                return await res.text();
-            })
-            .then((res) => console.log(res))
-            .catch((error) => console.log(`Error: ${error}`));
-    };
 
     return (
         <div className="font-sans bg-slate-100 min-h-screen p-8">
