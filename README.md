@@ -6,7 +6,8 @@ First, run the development servers:
 
 ```bash
 npm run dev
-# in a separate terminal
+
+# then in a separate terminal run
 node dist/server/server.js
 ```
 
