@@ -1,4 +1,4 @@
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { ListObjectsV2Command, PutObjectCommand, S3Client, } from "@aws-sdk/client-s3";
 export async function uploadImage(req, res) {
     // init s3 Client
     const s3Client = new S3Client({
@@ -44,9 +44,32 @@ export async function uploadImage(req, res) {
     });
 }
 export async function getImages(req, res) {
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "image/jpeg");
-    res.end("Image link");
+    // init s3 Client
+    const s3Client = new S3Client({
+        region: process.env.AWS_REGION,
+        credentials: {
+            accessKeyId: process.env.AWS_ACCESS_KEY_ID || "",
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
+        },
+    });
+    try {
+        // list objects in bucket
+        const listCommand = new ListObjectsV2Command({
+            Bucket: process.env.S3_BUCKET_NAME,
+        });
+        const response = await s3Client.send(listCommand);
+        const objects = response.Contents || [];
+        const imageUrls = objects.map((obj) => {
+            return `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${obj.Key}`;
+        });
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify(imageUrls));
+    }
+    catch (error) {
+        res.statusCode = 500;
+        console.log(`Downloading Images Error: ${error}`);
+    }
 }
 export function test(req, res) {
     res.statusCode = 200;

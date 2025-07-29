@@ -3,7 +3,10 @@ import { routeRequest } from "./routes/imgRoutes.js";
 import dotenv from "dotenv";
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
+//manually define due to use of ES modules
+// get current url
 const __filename = fileURLToPath(import.meta.url);
+// extract directory from path
 const __dirname = dirname(__filename);
 dotenv.config({ path: resolve(__dirname, "../../.env") });
 const host = "127.0.0.1";

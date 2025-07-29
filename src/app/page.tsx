@@ -1,5 +1,21 @@
 "use client";
+
+import { useEffect, useState } from "react";
+import Image from "next/image";
+
 export default function Home() {
+    const [imageUrls, setImageUrls] = useState<string[]>([]);
+
+    useEffect(() => {
+        fetch("http://localhost:3001/images")
+            .then((res) => res.json())
+            .then((res) => {
+                setImageUrls(res);
+                console.log(res);
+            })
+            .catch(console.error);
+    }, []);
+
     const uploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files ? e.target.files[0] : null;
         if (!file) {
@@ -32,6 +48,7 @@ export default function Home() {
                 <input type="text" placeholder="Search"></input>
             </div>
             <label>
+                {/* TODO: Add upload success msg */}
                 Upload
                 <input
                     style={{ display: "none" }}
@@ -41,6 +58,19 @@ export default function Home() {
                     onChange={(e) => uploadImage(e)}
                 ></input>
             </label>
+            {imageUrls.map((url, i) =>
+                url ? (
+                    <Image
+                        key={i}
+                        src={url}
+                        alt="Uploaded image"
+                        width={80}
+                        height={80}
+                        unoptimized
+                        priority
+                    />
+                ) : null
+            )}
         </div>
     );
 }
