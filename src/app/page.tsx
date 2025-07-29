@@ -100,6 +100,7 @@ export default function Home() {
                         <input
                             style={{ display: "none" }}
                             type="file"
+                            accept="image/*"
                             id="fileUpload"
                             name="upload"
                             onChange={(e) => uploadImage(e)}
