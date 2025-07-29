@@ -13,5 +13,13 @@ npm run dev
 node dist/server/server.js
 ```
 
+Approximate time: Roughly 12-14 hours
+
+Things I'd add:
+- Click to enlarge
+- Upload/Delete success messages
+- Add files from Google Drive or another source
+- Pagination
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to view my submission.
 
