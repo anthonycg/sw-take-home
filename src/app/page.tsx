@@ -5,6 +5,7 @@ import Image from "next/image";
 
 export default function Home() {
     const [imageUrls, setImageUrls] = useState<string[]>([]);
+    const [searchTerm, setSearchTerm] = useState("");
 
     const loadImages = useCallback(() => {
         fetch("http://localhost:3001/images")
@@ -89,6 +90,8 @@ export default function Home() {
                 </h1>
                 <div className="flex justify-between items-center mb-4">
                     <input
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        value={searchTerm}
                         type="text"
                         placeholder="Search"
                         className="border border-gray-300 text-black rounded-md px-4 py-2 w-full max-w-md"
@@ -108,30 +111,38 @@ export default function Home() {
                     </label>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                    {imageUrls.map((url, i) =>
-                        url ? (
-                            <div
-                                key={i}
-                                className="relative bg-white shadow-md rounded-md overflow-hidden"
-                            >
-                                <button
-                                    onClick={() => deleteImage(url)}
-                                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                    {imageUrls
+                        .filter((url) => {
+                            const splits = url.split("amazonaws.com/");
+                            const name = splits[splits.length - 1];
+                            return name
+                                .toLowerCase()
+                                .includes(searchTerm.toLowerCase());
+                        })
+                        .map((url, i) =>
+                            url ? (
+                                <div
+                                    key={i}
+                                    className="relative bg-white shadow-md rounded-md overflow-hidden"
                                 >
-                                    &times;
-                                </button>
-                                <Image
-                                    src={url}
-                                    alt="Uploaded image"
-                                    width={200}
-                                    height={200}
-                                    className="w-full h-48 object-cover"
-                                    unoptimized
-                                    priority
-                                />
-                            </div>
-                        ) : null
-                    )}
+                                    <button
+                                        onClick={() => deleteImage(url)}
+                                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                                    >
+                                        &times;
+                                    </button>
+                                    <Image
+                                        src={url}
+                                        alt="Uploaded image"
+                                        width={200}
+                                        height={200}
+                                        className="w-full h-48 object-cover"
+                                        unoptimized
+                                        priority
+                                    />
+                                </div>
+                            ) : null
+                        )}
                 </div>
             </div>
         </div>
