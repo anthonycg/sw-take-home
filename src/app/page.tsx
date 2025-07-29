@@ -78,13 +78,7 @@ export default function Home() {
     );
 
     useEffect(() => {
-        fetch("http://localhost:3001/images")
-            .then((res) => res.json())
-            .then((res) => {
-                setImageUrls(res);
-                loadImages();
-            })
-            .catch(console.error);
+        loadImages();
     }, [searchTerm, loadImages]);
 
     return (
@@ -115,39 +109,34 @@ export default function Home() {
                         />
                     </label>
                 </div>
+                <div className="text-black font-bold text-4xl mb-4">
+                    {imageUrls.length} Images
+                </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                    {imageUrls
-                        // .filter((url) => {
-                        //     const splits = url.split("amazonaws.com/");
-                        //     const name = splits[splits.length - 1];
-                        //     return name
-                        //         .toLowerCase()
-                        //         .includes(searchTerm.toLowerCase());
-                        // })
-                        .map((url, i) =>
-                            url ? (
-                                <div
-                                    key={i}
-                                    className="relative bg-white shadow-md rounded-md overflow-hidden"
+                    {imageUrls.map((url, i) =>
+                        url ? (
+                            <div
+                                key={i}
+                                className="relative bg-white shadow-md rounded-md overflow-hidden"
+                            >
+                                <button
+                                    onClick={() => deleteImage(url)}
+                                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
                                 >
-                                    <button
-                                        onClick={() => deleteImage(url)}
-                                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
-                                    >
-                                        &times;
-                                    </button>
-                                    <Image
-                                        src={url}
-                                        alt="Uploaded image"
-                                        width={200}
-                                        height={200}
-                                        className="w-full h-48 object-cover"
-                                        unoptimized
-                                        priority
-                                    />
-                                </div>
-                            ) : null
-                        )}
+                                    &times;
+                                </button>
+                                <Image
+                                    src={url}
+                                    alt="Uploaded image"
+                                    width={200}
+                                    height={200}
+                                    className="w-full h-48 object-cover"
+                                    unoptimized
+                                    priority
+                                />
+                            </div>
+                        ) : null
+                    )}
                 </div>
             </div>
         </div>
