@@ -6,7 +6,8 @@ First, run the development servers:
 
 ```bash
 npm run dev
-node dist/server/server.js // in a separate terminal
+# in a separate terminal
+node dist/server/server.js
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to view my submission.
