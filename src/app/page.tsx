@@ -8,13 +8,17 @@ export default function Home() {
     const [searchTerm, setSearchTerm] = useState("");
 
     const loadImages = useCallback(() => {
-        fetch("http://localhost:3001/images")
+        fetch(
+            `http://localhost:3001/images?search=${encodeURIComponent(
+                searchTerm
+            )}`
+        )
             .then((res) => res.json())
             .then((res) => {
                 setImageUrls(res);
             })
             .catch(console.error);
-    }, []);
+    }, [searchTerm]);
 
     const uploadImage = useCallback(
         async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,9 +82,10 @@ export default function Home() {
             .then((res) => res.json())
             .then((res) => {
                 setImageUrls(res);
+                loadImages();
             })
             .catch(console.error);
-    }, []);
+    }, [searchTerm, loadImages]);
 
     return (
         <div className="font-sans bg-slate-100 min-h-screen p-8">
@@ -112,13 +117,13 @@ export default function Home() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     {imageUrls
-                        .filter((url) => {
-                            const splits = url.split("amazonaws.com/");
-                            const name = splits[splits.length - 1];
-                            return name
-                                .toLowerCase()
-                                .includes(searchTerm.toLowerCase());
-                        })
+                        // .filter((url) => {
+                        //     const splits = url.split("amazonaws.com/");
+                        //     const name = splits[splits.length - 1];
+                        //     return name
+                        //         .toLowerCase()
+                        //         .includes(searchTerm.toLowerCase());
+                        // })
                         .map((url, i) =>
                             url ? (
                                 <div

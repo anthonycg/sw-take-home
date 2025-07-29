@@ -56,7 +56,11 @@ export async function uploadImage(req: IncomingMessage, res: ServerResponse) {
     });
 }
 
-export async function getImages(req: IncomingMessage, res: ServerResponse) {
+export async function getImages(
+    req: IncomingMessage,
+    res: ServerResponse,
+    query?: { [key: string]: unknown }
+) {
     // init s3 Client
     const s3Client = new S3Client({
         region: process.env.AWS_REGION,
@@ -71,10 +75,20 @@ export async function getImages(req: IncomingMessage, res: ServerResponse) {
             Bucket: process.env.S3_BUCKET_NAME,
         });
         const response = await s3Client.send(listCommand);
+        // set searchTerm to search prop
+        const searchTerm =
+            typeof query?.search === "string"
+                ? query.search.toLowerCase()
+                : undefined;
         const objects = response.Contents || [];
-        const imageUrls = objects.map((obj) => {
-            return `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${obj.Key}`;
-        });
+        //filter with search term and build urls
+        const imageUrls = objects
+            .filter((obj) =>
+                searchTerm ? obj.Key?.toLowerCase().includes(searchTerm) : obj
+            )
+            .map((obj) => {
+                return `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${obj.Key}`;
+            });
 
         res.statusCode = 200;
         res.setHeader("Content-Type", "application/json");

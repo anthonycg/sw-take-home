@@ -4,6 +4,7 @@ import {
     getImages,
     uploadImage,
 } from "../controllers/imgController.js";
+import { parse } from "url";
 
 export async function routeRequest(
     req: IncomingMessage,
@@ -23,8 +24,10 @@ export async function routeRequest(
 
     // handle routing to proper controller
     console.log("req", req.url);
-    if (req.method === "GET" && req.url === "/images") {
-        return await getImages(req, res);
+    // parse url to get pathname
+    const parsedUrl = parse(req.url || "", true);
+    if (req.method === "GET" && parsedUrl.pathname === "/images") {
+        return await getImages(req, res, parsedUrl.query);
     }
 
     if (req.method === "POST" && req.url == "/upload") {

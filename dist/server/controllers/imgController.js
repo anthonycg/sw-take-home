@@ -43,7 +43,7 @@ export async function uploadImage(req, res) {
         res.statusCode = 200;
     });
 }
-export async function getImages(req, res) {
+export async function getImages(req, res, query) {
     // init s3 Client
     const s3Client = new S3Client({
         region: process.env.AWS_REGION,
@@ -58,8 +58,16 @@ export async function getImages(req, res) {
             Bucket: process.env.S3_BUCKET_NAME,
         });
         const response = await s3Client.send(listCommand);
+        // set searchTerm to search prop
+        console.log(query);
+        const searchTerm = typeof query?.search === "string"
+            ? query.search.toLowerCase()
+            : undefined;
         const objects = response.Contents || [];
-        const imageUrls = objects.map((obj) => {
+        //filter with search term and build urls
+        const imageUrls = objects
+            .filter((obj) => searchTerm ? obj.Key?.toLowerCase().includes(searchTerm) : obj)
+            .map((obj) => {
             return `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${obj.Key}`;
         });
         res.statusCode = 200;
@@ -72,7 +80,6 @@ export async function getImages(req, res) {
     }
 }
 export function deleteImage(req, res) {
-    console.log("It hit the controller");
     // init s3 Client
     const s3Client = new S3Client({
         region: process.env.AWS_REGION,
@@ -83,7 +90,6 @@ export function deleteImage(req, res) {
     });
     let body = "";
     req.on("data", (stream) => {
-        console.log("Chunk received:", stream.toString());
         body += stream;
     });
     req.on("end", async () => {
