@@ -32,7 +32,6 @@ export async function routeRequest(
     }
 
     if (req.method === "POST" && req.url == "/delete") {
-        console.log("It hit the route");
         return deleteImage(req, res);
     }
 

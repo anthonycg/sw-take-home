@@ -86,7 +86,6 @@ export async function getImages(req: IncomingMessage, res: ServerResponse) {
 }
 
 export function deleteImage(req: IncomingMessage, res: ServerResponse) {
-    console.log("It hit the controller");
     // init s3 Client
     const s3Client = new S3Client({
         region: process.env.AWS_REGION,
@@ -97,7 +96,6 @@ export function deleteImage(req: IncomingMessage, res: ServerResponse) {
     });
     let body = "";
     req.on("data", (stream) => {
-        console.log("Chunk received:", stream.toString());
         body += stream;
     });
     req.on("end", async () => {
