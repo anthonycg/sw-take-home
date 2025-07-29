@@ -16,7 +16,7 @@ export default function Home() {
             .catch(console.error);
     }, []);
 
-    const uploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files ? e.target.files[0] : null;
         if (!file) {
             return;
@@ -24,7 +24,7 @@ export default function Home() {
 
         const fileName = file.name;
 
-        fetch("http://localhost:3001/upload", {
+        await fetch("http://localhost:3001/upload", {
             method: "POST",
             headers: {
                 "Content-Type": file.type,
@@ -37,6 +37,26 @@ export default function Home() {
                     throw new Error(`HTTP err, STATUS: ${res.status}`);
                 }
                 console.log(res.json);
+            })
+            .then((res) => console.log(res))
+            .catch((error) => console.log(`Error: ${error}`));
+    };
+
+    const deleteImage = async (url: string) => {
+        const splitKeys = url.split("amazonaws.com/");
+        const key = splitKeys[splitKeys.length - 1];
+        await fetch("http://localhost:3001/delete", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ key }),
+        })
+            .then(async (res) => {
+                if (!res.ok) {
+                    throw new Error(`HTTP err, STATUS: ${res.status}`);
+                }
+                return await res.text();
             })
             .then((res) => console.log(res))
             .catch((error) => console.log(`Error: ${error}`));
@@ -75,7 +95,7 @@ export default function Home() {
                                 className="relative bg-white shadow-md rounded-md overflow-hidden"
                             >
                                 <button
-                                    onClick={() => deleteImage(i)}
+                                    onClick={() => deleteImage(url)}
                                     className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
                                 >
                                     &times;

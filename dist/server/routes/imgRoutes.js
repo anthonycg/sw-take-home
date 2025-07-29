@@ -1,4 +1,4 @@
-import { getImages, test, uploadImage } from "../controllers/imgController.js";
+import { deleteImage, getImages, uploadImage, } from "../controllers/imgController.js";
 export async function routeRequest(req, res) {
     // handle CORS, content, options headers
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -18,8 +18,9 @@ export async function routeRequest(req, res) {
     if (req.method === "POST" && req.url == "/upload") {
         return await uploadImage(req, res);
     }
-    if (req.method === "GET" && req.url == "/test") {
-        return test(req, res);
+    if (req.method === "POST" && req.url == "/delete") {
+        console.log("It hit the route");
+        return deleteImage(req, res);
     }
     res.statusCode = 404;
     res.setHeader("Content-Type", "text/plain");

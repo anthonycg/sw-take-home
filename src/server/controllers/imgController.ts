@@ -1,4 +1,5 @@
 import {
+    DeleteObjectCommand,
     ListObjectsV2Command,
     PutObjectCommand,
     S3Client,
@@ -84,8 +85,37 @@ export async function getImages(req: IncomingMessage, res: ServerResponse) {
     }
 }
 
-export function test(req: IncomingMessage, res: ServerResponse) {
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "text/plain");
-    res.end("Success!");
+export function deleteImage(req: IncomingMessage, res: ServerResponse) {
+    console.log("It hit the controller");
+    // init s3 Client
+    const s3Client = new S3Client({
+        region: process.env.AWS_REGION,
+        credentials: {
+            accessKeyId: process.env.AWS_ACCESS_KEY_ID || "",
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
+        },
+    });
+    let body = "";
+    req.on("data", (stream) => {
+        console.log("Chunk received:", stream.toString());
+        body += stream;
+    });
+    req.on("end", async () => {
+        try {
+            const parsed = JSON.parse(body);
+            const key = parsed.key;
+            console.log("Parsed key:", key);
+            const delCommand = new DeleteObjectCommand({
+                Bucket: process.env.S3_BUCKET_NAME,
+                Key: key,
+            });
+            await s3Client.send(delCommand);
+
+            res.statusCode = 200;
+            res.end("Image deleted successfully.");
+        } catch (error) {
+            res.statusCode = 500;
+            console.log(`Downloading Images Error: ${error}`);
+        }
+    });
 }

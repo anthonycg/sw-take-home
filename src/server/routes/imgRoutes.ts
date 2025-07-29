@@ -1,5 +1,9 @@
 import { IncomingMessage, ServerResponse } from "http";
-import { getImages, test, uploadImage } from "../controllers/imgController.js";
+import {
+    deleteImage,
+    getImages,
+    uploadImage,
+} from "../controllers/imgController.js";
 
 export async function routeRequest(
     req: IncomingMessage,
@@ -27,8 +31,9 @@ export async function routeRequest(
         return await uploadImage(req, res);
     }
 
-    if (req.method === "GET" && req.url == "/test") {
-        return test(req, res);
+    if (req.method === "POST" && req.url == "/delete") {
+        console.log("It hit the route");
+        return deleteImage(req, res);
     }
 
     res.statusCode = 404;
